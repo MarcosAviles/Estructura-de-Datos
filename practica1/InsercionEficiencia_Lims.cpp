@@ -1,0 +1,162 @@
+#include <iostream>
+#include <chrono>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+
+
+using namespace std;
+using namespace std::chrono;
+
+
+void generar_aleatorio(vector<int> & V){
+  int i;
+  for ( i=0; i<V.size();i++){
+    V[i]=i;
+  }
+   random_shuffle(V.begin(),V.end()); //Desordenamos el vector
+}
+
+void burbuja(vector<int> & T, int inicial, int final)
+{
+ int i, j;
+ int aux;
+ for (i = inicial; i < final - 1; i++)
+   for (j = final - 1; j > i; j--)
+       if (T[j] < T[j-1]) //O(1)
+         {
+           aux = T[j]; //O(1)
+           T[j] = T[j-1]; //O(1)
+           T[j-1] = aux; //O(1)
+         }
+}
+void Insercion (vector<int> & T, int inicial, int final)
+{
+  int i, j;
+  int aux;
+  for (i = inicial; i < final - 1; i++){
+    aux=T[i];//O(1)
+    j=i;//O(1)
+    while (T[j-1]>aux) {
+      T[j]= T[j-1];//O(1)
+      j=j-1;//O(1)
+      if (j==0) break;//O(1)
+    } 
+    T[j]= aux;//O(1)
+  }
+}
+
+void Seleccion (vector<int> & T, int inicial, int final)
+{
+
+  int i, j;
+  int aux;
+  for (i = inicial; i < final - 1; i++) {
+    aux=j; //O(1)
+    for (i=j+1;i<final-1;i++)
+      if (T[i]<T[aux]){//O(1)
+        aux=i;//O(1)
+    	i= T[j];//O(1)
+    	T[j]= T[aux];//O(1)
+    	T[aux]=i;//O(1)
+      } 
+    }
+}
+int divide(vector<int> & T, int inicial, int final)
+{
+  int izq;
+  int der;
+  int pivote;
+  int temp;
+
+  pivote = T[inicial];
+  izq = inicial;
+  der = final;
+
+  //Mientras no se cruzen los índices
+  while (izq < der){
+    while (T[der] > pivote){
+    der--;
+    }
+
+  while ((izq < der) && (T[izq] <= pivote)){
+      izq++;
+    }
+
+    // Si todavia no se cruzan los indices seguimos intercambiando
+  if(izq < der){
+      temp= T[izq];
+      T[izq] = T[der];
+      T[der] = temp;
+    }
+  }
+
+  //Los indices ya se han cruzado, ponemos el pivote en el lugar que le corresponde
+  temp = T[der];
+  T[der] = T[inicial];
+  T[inicial] = temp;
+
+  //La nueva posición del pivote
+  return der;
+}
+void quicksort(vector<int> & T, int inicial, int final)
+{
+    int pivote;
+ 
+    if (inicial < final) {
+        pivote = divide(T, inicial, final); //O(n)
+ 
+        // Ordeno la lista de los menores
+        quicksort(T, inicial, pivote - 1);
+ 
+        // Ordeno la lista de los mayores
+        quicksort(T, pivote + 1, final);
+    }
+}
+
+
+void calcula_tiempo(int tama){
+
+high_resolution_clock::time_point tantes,tdespues;
+duration<double> tiempo_transcurrido;
+
+vector<int> V(tama);
+generar_aleatorio(V);
+
+ 
+  tantes = high_resolution_clock::now();
+  Seleccion(V,0,V.size()); // Solo queremos evaluar este algoritmo
+  tdespues = high_resolution_clock::now();
+
+  V.clear();
+
+
+tiempo_transcurrido  = duration_cast<duration<double> >(tdespues - tantes);
+cout << tama << " " << tiempo_transcurrido.count() << endl;
+ 
+}
+
+int main(int argc, char * argv[]){
+int tmin,tmax,inc; // tamaño minimo, maximo e incremento
+// Llamada ejecutable minimo maximo inc   
+
+if (argc < 4) {
+   cout << "Llamada ejecutable tminimo tmaximo inc" <<endl;
+   return(0);
+}
+else {
+   tmin = std::atoi(argv[1]);
+   tmax = std::atoi(argv[2]);
+   inc = std::atoi(argv[3]);
+}
+
+for (int i = tmin; i<=tmax; i+=inc)
+   calcula_tiempo(i);
+
+
+
+  
+return 0;
+
+}
+ 
